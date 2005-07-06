@@ -1,0 +1,5 @@
+#!/bin/ksh
+if [ "$PRETTYXML_HOME" = "" ] ; then echo "please set PRETTYXML_HOME"; exit 1 ; fi 
+if [ "$JAVA_HOME" != "" ] ; then JAVA_COMMAND="$JAVA_HOME/bin/java" ; else JAVA_COMMAND=java ; fi 
+"$JAVA_COMMAND" -cp "$PRETTYXML_HOME/lib/prettyxml.jar:$PRETTYXML_HOME/lib/jdom-1.0.jar:$PRETTYXML_HOME/lib/commons-cli-1.0.jar:$PRETTYXML_HOME/lib/commons-io-1.0.jar" dk.hippogrif.prettyxml.Main "$@"
+
