@@ -6,7 +6,7 @@ goto doit
 :no_java_home
 set JAVA_COMMAND=java
 :doit
-%JAVA_COMMAND% -cp %PRETTYXML_HOME%\lib\prettyxml.jar;%PRETTYXML_HOME%\lib\jdom-1.0.jar;%PRETTYXML_HOME%\lib\commons-cli-1.0.jar;%PRETTYXML_HOME%\lib\commons-io-1.0.jar dk.hippogrif.prettyxml.Main %*
+%JAVA_COMMAND% -jar %PRETTYXML_HOME%\lib\prettyxml.jar %*
 goto :end
 :no_home
 echo please set PRETTYXML_HOME

@@ -30,6 +30,8 @@ or
   export PRETTYXML_HOME=/opt/prettyxml  (on Unix)
 
 Run prettyxml with
+  java -jar %PRETTYXML_HOME%/lib/prettyxml.jar options
+or use one of the scripts
   %PRETTYXML_HOME%\prettyxml options  (Windows)
 or
   $PRETTYXML_HOME/prettyxml options  (Unix)

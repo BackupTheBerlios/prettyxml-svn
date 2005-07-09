@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="prettyxml" default="help" basedir=".">
 
-  <property name="version" value="1.0.0"/>
+  <property name="version" value="1.0.1"/>
   <property name="name" value="prettyxml"/>
 
   <property name="build.dir" location="build"/>
@@ -13,19 +13,26 @@
   <property name="tmp.dir" location="tmp"/>
   <property name="samples.dir" location="samples"/>
   <property name="lib.dir" location="lib"/>
+  <property name="jdom.jar" value="jdom-1.0.jar"/>
+  <property name="commons-cli.jar" value="commons-cli-1.0.jar"/>
+  <property name="commons-io.jar" value="commons-io-1.0.jar"/>
 
   <property environment="env"/>
   <property name="distfile" location="${build.dir}/${name}-${version}.zip"/>
 
   <path id="compile.class.path">
-    <pathelement location="${lib.dir}/jdom-1.0.jar"/>
-    <pathelement location="${lib.dir}/commons-cli-1.0.jar"/>
-    <pathelement location="${lib.dir}/commons-io-1.0.jar"/>
+    <pathelement location="${lib.dir}/${jdom.jar}"/>
+    <pathelement location="${lib.dir}/${commons-cli.jar}"/>
+    <pathelement location="${lib.dir}/${commons-io.jar}"/>
   </path>
 
   <path id="run.class.path">
     <pathelement location="${lib.dir}/${name}.jar"/>
+  </path>
+
+  <path id="compile.test.class.path">
     <path refid="compile.class.path"/>
+    <path refid="run.class.path"/>
   </path>
 
   <path id="test.class.path">
@@ -66,6 +73,7 @@
     <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.dest}">
       <metainf file="LICENSE.txt"/>
       <manifest>
+        <attribute name="Class-Path" value="${jdom.jar} ${commons-io.jar} ${commons-cli.jar}"/>
         <attribute name="Main-Class" value="dk.hippogrif.prettyxml.Main"/>
         <section name="dk/hippogrif/prettyxml">
           <attribute name="Implementation-Title" value="prettyxml"/>
@@ -108,9 +116,9 @@
         <include name="samples/**/*"/>
       </fileset>
       <zipfileset dir="${lib.dir}" prefix="lib">
-        <include name="jdom-1.0.jar"/>
-        <include name="commons-cli-1.0.jar"/>
-        <include name="commons-io-1.0.jar"/>
+        <include name="${jdom.jar}"/>
+        <include name="${commons-cli.jar}"/>
+        <include name="${commons-io.jar}"/>
         <include name="${name}.jar"/>
       </zipfileset>
       <fileset dir="${build.dir}" includes="apidocs/**/*"/>
@@ -147,7 +155,7 @@
   <target name="compile.test" depends="prepare" description="Compiles the test code">
     <mkdir dir="${build.test}"/>
     <javac srcdir="${test.dir}" destdir="${build.test}" debug="true">
-      <classpath refid="run.class.path"/>
+      <classpath refid="compile.test.class.path"/>
     </javac>
   </target>
 
@@ -167,9 +175,9 @@
     <property name="antlib" value="${env.ANT_HOME}/lib"/>
     <get src="${repository}/junit/jars/junit-3.8.1.jar" dest="${antlib}/junit-3.8.1.jar"/>
     <mkdir dir="${lib.dir}"/>
-    <get src="${repository}/commons-cli/jars/commons-cli-1.0.jar" dest="${lib.dir}/commons-cli-1.0.jar"/>
-    <get src="${repository}/commons-io/jars/commons-io-1.0.jar" dest="${lib.dir}/commons-io-1.0.jar"/>
-    <get src="${repository}/jdom/jars/jdom-1.0.jar" dest="${lib.dir}/jdom-1.0.jar"/>
+    <get src="${repository}/commons-cli/jars/${commons-cli.jar}" dest="${lib.dir}/${commons-cli.jar}"/>
+    <get src="${repository}/commons-io/jars/${commons-io.jar}" dest="${lib.dir}/${commons-io.jar}"/>
+    <get src="${repository}/jdom/jars/${jdom.jar}" dest="${lib.dir}/${jdom.jar}"/>
   </target>
 
 </project>
