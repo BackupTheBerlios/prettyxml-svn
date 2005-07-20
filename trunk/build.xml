@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="prettyxml" default="help" basedir=".">
 
-  <property name="version" value="1.0.1"/>
+  <property name="version" value="1.1.0"/>
   <property name="name" value="prettyxml"/>
 
   <property name="build.dir" location="build"/>
@@ -40,6 +40,11 @@
     <path refid="run.class.path"/>
   </path>
 
+  <path id="javadoc.class.path">
+    <path refid="compile.class.path"/>
+    <pathelement location="${build.dest}"/>
+  </path>
+
   <target name="init">
     <tstamp/>
   </target>
@@ -64,16 +69,13 @@
     <javac srcdir="${src.dir}" destdir="${build.dest}">
       <classpath refid="compile.class.path"/>
     </javac>
-    <echo message="version = ${version}" file="${build.dest}/prettyxml.properties"/>
-    <copy file="${samples.dir}/sort-attributes.xslt" todir="${build.dest}" preservelastmodified="true"/>
-    <copy file="${samples.dir}/sort-elements.xslt" todir="${build.dest}" preservelastmodified="true"/>
   </target>
 
-  <target name="jar" depends="compile" description="Creates the class package">
+  <target name="jar" depends="compile,collect" description="Creates the class package">
     <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.dest}">
       <metainf file="LICENSE.txt"/>
       <manifest>
-        <attribute name="Class-Path" value="${jdom.jar} ${commons-io.jar} ${commons-cli.jar}"/>
+        <attribute name="Class-Path" value="${jdom.jar} ${commons-io.jar} ${commons-cli.jar} ."/>
         <attribute name="Main-Class" value="dk.hippogrif.prettyxml.Main"/>
         <section name="dk/hippogrif/prettyxml">
           <attribute name="Implementation-Title" value="prettyxml"/>
@@ -85,7 +87,19 @@
     </jar>
   </target>
 
-  <target name="javadoc" depends="prepare" description="Creates the API documentation">
+  <target name="collect" description="Collects other files in classpath">
+    <echo message="version = ${version}" file="${build.dest}/${name}.properties"/>
+    <copy todir="${build.dest}" preservelastmodified="true">
+      <fileset dir="${src.dir}" includes="**/image/*"/>
+    </copy>
+    <copy todir="${build.dest}" preservelastmodified="true">
+      <fileset dir="${src.dir}" includes="**/package.html"/>
+    </copy>
+    <copy file="${samples.dir}/sort-attributes.xslt" todir="${build.dest}" preservelastmodified="true"/>
+    <copy file="${samples.dir}/sort-elements.xslt" todir="${build.dest}" preservelastmodified="true"/>
+  </target>
+
+  <target name="javadoc" depends="compile" description="Creates the API documentation">
     <mkdir dir="${build.javadocs}"/>
     <javadoc packagenames="dk.hippogrif.prettyxml"
              sourcepath="${src.dir}"
@@ -100,7 +114,7 @@
              doctitle="${name} v${version}&lt;br&gt;API Specification"
              header="&lt;b&gt;${name}&lt;br&gt;&lt;font size='-1'&gt;${version}&lt;/font&gt;&lt;/b&gt;"
              bottom="Copyright &#169; 2005 Jesper Goertz. All Rights Reserved.">
-      <classpath refid="run.class.path"/>
+      <classpath refid="javadoc.class.path"/>
     </javadoc>
   </target>
 
@@ -159,7 +173,7 @@
     </javac>
   </target>
 
-  <target name="test" depends="compile.test" description="Runs test">
+  <target name="test" depends="jar,compile.test" description="Runs test">
     <mkdir dir="${tmp.dir}"/>
     <junit>
       <classpath refid="test.class.path"/>
@@ -167,6 +181,7 @@
       <sysproperty key="dk.hippogrif.prettyxml.MainTest.dir" value="${test.dir}"/>
       <sysproperty key="dk.hippogrif.prettyxml.MainTest.tmp" value="${tmp.dir}"/>
       <test name="dk.hippogrif.prettyxml.MainTest"/>
+      <test name="dk.hippogrif.prettyxml.PrettyPrintTest"/>
     </junit>
   </target>
 

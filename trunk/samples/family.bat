@@ -13,7 +13,6 @@ call %PRETTYXML_HOME%\prettyxml -t sort-attributes.xslt;sort-elements.xslt -u ht
 
 echo --- prettyprint with 4 space indentation, attribute indent and sort on text ---
 call %PRETTYXML_HOME%\prettyxml -n 4 -a -t %PRETTYXML_HOME%\samples\sort-text.xslt -u http://www.cafeconleche.org/books/xml/examples/07/family.xml
-
 goto :end
 
 :no_home

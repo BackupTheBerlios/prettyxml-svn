@@ -27,7 +27,7 @@ public class MainTest extends TestCase {
   }
   
   private String testdir, tmpdir;
-
+  
   protected String getDir(String property) throws Exception {
     String name = "dk.hippogrif.prettyxml.MainTest."+property;
     String dir = System.getProperty(name);
@@ -52,14 +52,6 @@ public class MainTest extends TestCase {
   }
   
   /**
-   * Test of getVersion method, of class dk.hippogrif.prettyxml.Main.
-   */
-  public void testGetVersion() {
-    System.out.println("testGetVersion");
-    assertNull(Main.getVersion());
-  }
-  
-  /**
    * Test of getCmdLine method, of class dk.hippogrif.prettyxml.Main.
    */
   public void testGetCmdLine() {
@@ -79,196 +71,6 @@ public class MainTest extends TestCase {
     cmd = Main.getCmdLine(new String[]{"-a","-i","file"});
     assertNotNull(cmd);
     assertTrue(cmd.hasOption("a") && cmd.hasOption("i"));
-  }
-  
-  /**
-   * Test of setIndentation method, of class dk.hippogrif.prettyxml.Main.
-   */
-  public void testSetIndentation() {
-    System.out.println("testSetIndentation");
-    Format format = Format.getRawFormat();
-    try {
-      Main.setIndentation("notanumber", format);
-      fail("notanumber");
-    } catch (Exception e) {}
-    try {
-      Main.setIndentation("0", format);
-      fail("0");
-    } catch (Exception e) {}
-    try {
-      Main.setIndentation("1", format);
-      assertTrue(format.getIndent().equals(" "));
-      Main.setIndentation("8", format);
-      assertTrue(format.getIndent().equals("        "));
-    } catch (Exception e) {
-      fail(e.toString());
-    }
-  }
-  
-  /**
-   * Test of initFormat method, of class dk.hippogrif.prettyxml.Main.
-   */
-  public void testInitFormat() {
-    System.out.println("testInitFormat");
-    Properties prop = new Properties();
-    Format format;
-    try {
-      format = Main.initFormat(prop);
-      assertTrue(format.getTextMode().equals(Format.TextMode.TRIM));
-      prop.setProperty("format", "PRETTY");
-      format = Main.initFormat(prop);
-      assertTrue(format.getTextMode().equals(Format.TextMode.TRIM));
-      prop.setProperty("format", "COMPACT");
-      format = Main.initFormat(prop);
-      assertTrue(format.getTextMode()==Format.TextMode.NORMALIZE);
-      prop.setProperty("format", "RAW");
-      format = Main.initFormat(prop);
-      assertTrue(format.getTextMode()==Format.TextMode.PRESERVE);
-      prop.setProperty("format", "RAW");
-      prop.setProperty("encoding", "UTF-16");
-      prop.setProperty("expandEmptyElements", "TRUE");
-      prop.setProperty("indent", "3");
-      prop.setProperty("lineSeparator", "\r");
-      prop.setProperty("omitDeclaration", "TRUE");
-      prop.setProperty("omitEncoding", "TRUE");
-      prop.setProperty("textMode", "NORMALIZE");
-      format = Main.initFormat(prop);
-      assertTrue(format.getEncoding().equals("UTF-16"));
-      assertTrue(format.getExpandEmptyElements());
-      assertTrue(format.getIndent().equals("   "));
-      assertTrue(format.getLineSeparator().equals("\r"));
-      assertTrue(format.getOmitDeclaration());
-      assertTrue(format.getOmitEncoding());
-      assertTrue(format.getTextMode()==Format.TextMode.NORMALIZE);
-      prop.clear();
-      prop.setProperty("format", "RAW");
-      prop.setProperty("expandEmptyElements", "FALSE");
-      prop.setProperty("omitDeclaration", "FALSE");
-      prop.setProperty("omitEncoding", "FALSE");
-      prop.setProperty("textMode", "TRIM");
-      format = Main.initFormat(prop);
-      assertTrue(!format.getExpandEmptyElements());
-      assertTrue(!format.getOmitDeclaration());
-      assertTrue(!format.getOmitEncoding());
-      assertTrue(format.getTextMode().equals(Format.TextMode.TRIM));
-      prop.clear();
-      prop.setProperty("format", "RAW");
-      prop.setProperty("textMode", "TRIM_FULL_WHITE");
-      format = Main.initFormat(prop);
-      assertTrue(format.getTextMode().equals(Format.TextMode.TRIM_FULL_WHITE));
-      prop.clear();
-      prop.setProperty("format", "RAW");
-      prop.setProperty("textMode", "PRESERVE");
-      format = Main.initFormat(prop);
-      assertTrue(format.getTextMode().equals(Format.TextMode.PRESERVE));
-    } catch (Exception e) {
-      fail(e.toString());
-    }
-    try {
-      prop.clear();
-      prop.setProperty("textMode", "unknown");
-      format = Main.initFormat(prop);
-      fail("unknown textMode");
-    } catch (Exception e) {}
-    try {
-      prop.clear();
-      prop.setProperty("format", "unknown");
-      format = Main.initFormat(prop);
-      fail("unknown format");
-    } catch (Exception e) {}
-  }
-  
-  /**
-   * Test of readFormat method, of class dk.hippogrif.prettyxml.Main.
-   */
-  public void testCheckProperties() {
-    System.out.println("testCheckProperties");
-    Properties prop = new Properties();;
-    try {
-      Main.checkProperties(prop);
-    } catch (Exception e) {
-      fail(e.toString());
-    }
-    try {
-      prop.setProperty("format","x");
-      prop.setProperty("encoding","x");
-      prop.setProperty("expandEmptyElements","true");
-      prop.setProperty("indent","x");
-      prop.setProperty("lineSeparator","x");
-      prop.setProperty("omitDeclaration","false");
-      prop.setProperty("omitEncoding","True");
-      prop.setProperty("textMode","x");
-      prop.setProperty("indentAttributes","False");
-      prop.setProperty("sortAttributes","TRUE");
-      prop.setProperty("transform","x");
-      prop.setProperty("input","x");
-      prop.setProperty("output","x");
-      assertTrue(Main.keys.size()-1 == prop.size());
-      Main.checkProperties(prop);
-      assertTrue(11 == prop.size());
-    } catch (Exception e) {
-      fail(e.toString());
-    }
-    try {
-      prop.clear();
-      prop.setProperty("url","x");
-      Main.checkProperties(prop);
-    } catch (Exception e) {
-      fail(e.toString());
-    }
-    try {
-      prop.clear();
-      prop.setProperty("x","y");
-      Main.checkProperties(prop);
-      fail("unknown property");
-    } catch (Exception e) {}
-    try {
-      prop.clear();
-      prop.setProperty("input","aaa");
-      prop.setProperty("url","bbb");
-      Main.checkProperties(prop);
-      fail("input and url");
-    } catch (Exception e) {}
-    try {
-      prop.clear();
-      prop.setProperty("omitEncoding","y");
-      Main.checkProperties(prop);
-      fail("bad boolean");
-    } catch (Exception e) {}
-  }
-  
-  
-  /**
-   * Test of readFormat method, of class dk.hippogrif.prettyxml.Main.
-   */
-  public void testReadFormat() {
-    System.out.println("testReadFormat");
-    try {
-      Main.readFormat(testdir+"/ex.properties");
-    } catch (Exception e) {
-      fail(e.toString());
-    }
-  }
-  
-  /**
-   * Test of checkBoolean method, of class dk.hippogrif.prettyxml.Main.
-   */
-  public void testCheckBoolean() {
-    System.out.println("testCheckBoolean");
-    Properties prop = new Properties();
-    prop.setProperty("f", "faLSe");
-    prop.setProperty("t", "TRue");
-    prop.setProperty("w", "what");
-    try {
-      Main.checkBoolean("notkey", prop);
-      assertTrue(prop.size() == 3);
-      Main.checkBoolean("f", prop);
-      assertFalse(prop.containsKey("f"));
-      Main.checkBoolean("t", prop);
-      assertTrue(prop.containsKey("t"));
-      Main.checkBoolean("w", prop);
-      fail("what");
-    } catch (Exception e) {}
   }
   
   /**
@@ -309,33 +111,15 @@ public class MainTest extends TestCase {
   }
   
   /**
-   * Test of readFormat method, of class dk.hippogrif.prettyxml.Main.
-   */
-  public void testMkTransformer() {
-    System.out.println("testMkXSLTransformer");
-    try {
-      Main.mkTransformer(testdir+"/sort-elements.xslt");
-      Main.mkTransformer("sort-attributes.xslt");
-    } catch (Exception e) {
-      fail(e.toString());
-    }
-    try {
-      Main.mkTransformer("unknown.xslt");
-      fail("unknown xslt");
-    } catch (Exception e) {}
-  }
-  
-  /**
-   * Test of main method, of class dk.hippogrif.prettyxml.Main.
+   * Test of go method, of class dk.hippogrif.prettyxml.Main.
    */
   public void testGo() {
-    System.out.println("testMain");
+    System.out.println("testGo");
     try {
       Main.go(new String[]{"-a","-s","-i",testdir+"/in1.xml","-o",tmpdir+"/tmp1.xml"});
       assertTrue(FileUtils.contentEquals(new File(testdir+"/out1.xml"), new File(tmpdir+"/tmp1.xml")));
       Main.go(new String[]{"-a","-u","http://www.cafeconleche.org/books/xml/examples/07/family.xml","-o",tmpdir+"/tmp2.xml"});
       assertTrue(FileUtils.contentEquals(new File(testdir+"/family.xml"), new File(tmpdir+"/tmp2.xml")));
-      
     } catch (Exception e) {
       fail(e.toString());
     }

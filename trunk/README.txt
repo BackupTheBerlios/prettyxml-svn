@@ -4,9 +4,9 @@ Description
 prettyxml is a free java utility for prettyprinting xml with attribute
 sorting and indentation.
 
-prettyxml is a command-line application based on JDOM. It offers various
-format options and supports element sorting and node filtering via 
-stylesheet transformations.
+prettyxml is a command-line and GUI application based on JDOM. 
+It offers various format options and supports element sorting and node 
+filtering via stylesheet transformations.
 
 Copyright (C) 2005 Jesper Goertz
 All Rights Reserved
@@ -40,7 +40,9 @@ Say "prettyxml -v" to get the version and "prettyxml -h" to get help.
 
 Transformation stylesheets are first located as files then as resources
 on the classpath - sort-attributes.xslt and sort-elements.xslt are built-in.
+You may place your own stylesheets in lib to be found as resources.
 
+If invoked without options a GUI is activated for format and option setting.
 
 Examples
 ========
@@ -54,7 +56,7 @@ Files
 LICENSE.txt       The License file (GPL)
 README.txt        An english readme (this file)
 apidoc            directory holding javadoc for prettyxml
-lib               directory holding jar files
+lib               directory holding jar files and stylesheets
 samples           directory holding examples
 prettyxml         Unix script to run prettyxml
 prettyxml.bat     Windows script to run prettyxml

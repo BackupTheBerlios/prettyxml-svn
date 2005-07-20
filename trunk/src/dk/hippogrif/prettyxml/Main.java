@@ -22,87 +22,35 @@ package dk.hippogrif.prettyxml;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 
-import org.jdom.*;
-import org.jdom.input.*;
-import org.jdom.output.*;
-import org.jdom.transform.XSLTransformer;
-
 /**
- * A command line application for prettyprinting an xml file. <p/>
- * <code>Main</code> takes the following optional arguments
- * <p/><pre>
- *   -a              indent attributes
- *   -h              help
- *   -i file         input file
- *   -n no           no of spaces to indent, default 2
- *   -o file         output file
- *   -p file         property file holding output format and options
- *   -s              sort attributes on name
- *   -t files        an xslt pipeline of one or more stylesheets separated by ;
- *   -u url          input url
- *   -v              version </pre>
- *
- * The property file may hold the following {@link org.jdom.output.Format Format} properties and prettyxml options<pre>
- *   format = COMPACT | RAW | PRETTY (default)
- *   encoding = string, e.g., UTF-8, ISO-8859-1
- *   expandEmptyElements = TRUE | FALSE
- *   indent = no of spaces to indent
- *   lineSeparator = string, i.e., \r, \n or \r\n (default)
- *   omitDeclaration = TRUE | FALSE
- *   omitEncoding = TRUE | FALSE
- *   textMode = NORMALIZE | TRIM | TRIM_FULL_WHITE | PRESERVE
- *   indentAttributes = TRUE | FALSE
- *   sortAttributes = TRUE | FALSE
- *   transform = an xslt pipeline of one or more stylesheets separated by ;
- *   input = input file
- *   url = input url
- *   output = output file </pre>
- *
- * Use the xslt pipeline to sort elements or filter nodes -<br/>
- * stylesheets are located first as files then as resources on the classpath.<br/>
- * Standard input is used if no file or url is specified.<br/>
- * Standard output is used if no file is specified.<br/>
+ * A command line application for prettyprinting an xml file.
+ * If no options are present the GUI application is invoked.
+ * See {@link dk.hippogrif.prettyxml}.
  *
  * @author Jesper Goertz
+ * @see MainJFrame
  */
 public class Main {
   
+  private static Logger logger = Logger.getLogger("dk.hippogrif.prettyxml.Main");
   private static String version;
-  
   private static Options options;
   private static List optionList;
   
-  public static String getVersion() {
-    return version;
-  }
-
   /**
-   * init options for resetting options between (test) uses, 
+   * init options for resetting options between (test) uses,
    * because commons-cli-1.0 from maven stores state in them
    * whereas the original 1.0 does not
-   */  
-  public static void initOptions() {
+   */
+  static void initOptions() {
     options = mkOptions();
     optionList = sortOptions(options);
-  }
-
-  private static void getConfiguration() throws Exception {
-    InputStream is = null;
-    try {
-      is = new Main().getClass().getResourceAsStream("/prettyxml.properties");
-      Properties prop = new Properties();
-      prop.load(is);
-      version = (String)prop.getProperty("version", "");
-      if (version.equals("")) {
-        throw new Exception("unknown version of prettyxml");
-      }
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
   }
   
   private static List sortOptions(Options options) {
@@ -149,16 +97,15 @@ public class Main {
     usage(ps);
     ps.println("");
     ps.println("the property file may hold the following properties:");
-    ps.println("  format = COMPACT | RAW | PRETTY (default)");
-    ps.println("  encoding = string, e.g., UTF-8, ISO-8859-1");
-    ps.println("  expandEmptyElements = TRUE | FALSE");
-    ps.println("  indent = no of spaces to indent");
+    ps.println("  encoding = string, e.g., UTF-8 (default), ISO-8859-1");
+    ps.println("  expandEmptyElements = TRUE | FALSE (default)");
+    ps.println("  indent = no of spaces to indent (min 1, max 99)");
     ps.println("  lineSeparator = string, i.e., \\r, \\n or \\r\\n (default)");
-    ps.println("  omitDeclaration = TRUE | FALSE");
-    ps.println("  omitEncoding = TRUE | FALSE");
-    ps.println("  textMode = NORMALIZE | TRIM | TRIM_FULL_WHITE | PRESERVE");
-    ps.println("  indentAttributes = TRUE | FALSE");
-    ps.println("  sortAttributes = TRUE | FALSE");
+    ps.println("  omitDeclaration = TRUE | FALSE (default)");
+    ps.println("  omitEncoding = TRUE | FALSE (default)");
+    ps.println("  textMode = NORMALIZE | TRIM | TRIM_FULL_WHITE | PRESERVE (default)");
+    ps.println("  indentAttributes = TRUE | FALSE (default)");
+    ps.println("  sortAttributes = TRUE | FALSE (default)");
     ps.println("  transform = an xslt pipeline of one or more stylesheets separated by ;");
     ps.println("  input = input file");
     ps.println("  url = input url");
@@ -198,16 +145,18 @@ public class Main {
     }
   }
   
-  public static CommandLine parse(String[] args) {
+  static CommandLine parse(String[] args) {
     CommandLineParser parser = new BasicParser();
     CommandLine cmd = null;
     try {
       cmd = parser.parse(options, args);
-    } catch (ParseException pe) { }
+    } catch (ParseException pe) {
+      logger.log(Level.FINE, "parse", pe);
+    }
     return cmd;
   }
   
-  public static CommandLine getCmdLine(String[] args) {
+  static CommandLine getCmdLine(String[] args) {
     initOptions();
     CommandLine cmd = parse(args);
     if (args.length == 0 || cmd == null || cmd.getArgs().length > 0) {
@@ -223,107 +172,14 @@ public class Main {
     return cmd;
   }
   
-  public static void setIndentation(String no, Format format) throws Exception {
-    int n = Integer.parseInt(no);
-    if (n > 0) {
-      StringBuffer sb = new StringBuffer(n);
-      for (int i=0; i<n; i++) {
-        sb.append(' ');
-      }
-      format.setIndent(sb.toString());
-    } else throw new Exception("-n indentation must be > 0, was "+n);
-  }
-  
-  public static Format initFormat(Properties prop) throws Exception {
-    Format format = Format.getPrettyFormat();
-    String p;
-    if ((p = prop.getProperty("format")) != null) {
-      if (p.equals("COMPACT")) {
-        format = Format.getCompactFormat();
-      } else if (p.equals("RAW")) {
-        format = Format.getRawFormat();
-      } else if (!p.equals("PRETTY")) {
-        throw new Exception("invalid format in properties file:"+p);
-      }
-    }
-    if ((p = prop.getProperty("encoding")) != null) {
-      format.setEncoding(p);
-    }
-    if ((p = prop.getProperty("expandEmptyElements")) != null) {
-      format.setExpandEmptyElements(Boolean.valueOf(p).booleanValue());
-    }
-    if ((p = prop.getProperty("indent")) != null) {
-      setIndentation(p, format);
-    }
-    if ((p = prop.getProperty("lineSeparator")) != null) {
-      format.setLineSeparator(p);
-    }
-    if ((p = prop.getProperty("omitDeclaration")) != null) {
-      format.setOmitDeclaration(Boolean.valueOf(p).booleanValue());
-    }
-    if ((p = prop.getProperty("omitEncoding")) != null) {
-      format.setOmitEncoding(Boolean.valueOf(p).booleanValue());
-    }
-    if ((p = prop.getProperty("textMode")) != null) {
-      if (p.equals("NORMALIZE")) {
-        format.setTextMode(Format.TextMode.NORMALIZE);
-      } else if (p.equals("TRIM")) {
-        format.setTextMode(Format.TextMode.TRIM);
-      } else if (p.equals("TRIM_FULL_WHITE")) {
-        format.setTextMode(Format.TextMode.TRIM_FULL_WHITE);
-      } else if (!p.equals("PRESERVE")) {
-        throw new Exception("invalid textMode in properties file: "+p);
-      }
-    }
-    return format;
-  }
-  
-  final public static List keys = Arrays.asList(new String[]{"format","encoding","expandEmptyElements","indent","lineSeparator","omitDeclaration","omitEncoding","textMode","sortAttributes","indentAttributes","transform","input","url","output"});
-  
-  public static void checkProperties(Properties prop) throws Exception {
-    for (Enumeration elements = prop.propertyNames(); elements.hasMoreElements(); ) {
-      String s = (String)elements.nextElement();
-      if (!keys.contains(s)) {
-        throw new Exception("unknown property in properties file: "+s);
-      }
-    }
-    checkBoolean("expandEmptyElements", prop);
-    checkBoolean("omitDeclaration", prop);
-    checkBoolean("omitEncoding", prop);
-    checkBoolean("indentAttributes", prop);
-    checkBoolean("sortAttributes", prop);
-    if (prop.containsKey("input") && prop.containsKey("url")) {
-      throw new Exception("do not use input and url at the same time");
-    }
-  }
-  
-  public static Properties readFormat(String filename) throws Exception {
-    Properties prop = new Properties();
-    FileInputStream fis = null;
-    try {
-      fis = new FileInputStream(filename);
-      prop.load(fis);
-    } finally {
-      IOUtils.closeQuietly(fis);
-    }
-    return prop;
-  }
-  
-  public static void checkBoolean(String key, Properties prop) throws Exception {
-    String s = prop.getProperty(key);
-    if (s != null) {
-      if ("FALSE".equalsIgnoreCase(s)) {
-        prop.remove(key);
-      } else if (!("TRUE".equalsIgnoreCase(s))) {
-        throw new Exception("value of property "+key+" must be TRUE or FALSE, was: "+s);
-      }
-    }
-  }
-  
-  public static Properties getProperties(CommandLine cmd) throws Exception {
+  static Properties getProperties(CommandLine cmd) throws Exception {
     Properties prop = new Properties();
     if (cmd.hasOption("p")) {
-      prop = readFormat(cmd.getOptionValue("p"));
+      prop = PrettyPrint.loadProperties(new File(cmd.getOptionValue("p")));
+    } else {
+      // default Pretty format
+      prop.put("indent", "2");
+      prop.put("textMode", "TRIM");
     }
     if (cmd.hasOption("n")) {
       prop.put("indent", cmd.getOptionValue("n"));
@@ -346,72 +202,35 @@ public class Main {
     if (cmd.hasOption("u")) {
       prop.put("url", cmd.getOptionValue("u"));
     }
-    checkProperties(prop);
+    PrettyPrint.checkProperties(prop);
     return prop;
   }
   
-  public static XSLTransformer mkTransformer(String name) throws Exception {
-    File file = new File(name);
-    if (file.isFile()) {
-      return new XSLTransformer(file);
-    }
-    InputStream is = null;
-    try {
-      is = new Main().getClass().getResourceAsStream("/"+name);
-      if (is == null) {
-        throw new Exception("cannot find stylesheet "+name);
-      }
-      return new XSLTransformer(is);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-  
+  /**
+   * Application using commandline options or running GUI if no options.
+   */
   public static void main(String[] args) {
     try {
-      go(args);
+      PrettyPrint prettyPrint = new PrettyPrint();
+      version = prettyPrint.getVersion();
+      if (args.length == 0) {
+        MainJFrame.run(version);
+      } else {
+        go(args);
+      }
     } catch (Exception e) {
+      logger.log(Level.FINE, "main", e);
       System.err.println(e.getMessage());
     }
   }
   
-  public static void go(String[] args) throws Exception {
-    getConfiguration();
+  static void go(String[] args) throws Exception {
     CommandLine cmd = getCmdLine(args);
     if (cmd == null) {
       return;
     }
     Properties prop = getProperties(cmd);
-    Format format = initFormat(prop);
-    PrettyXMLOutputter outp = new PrettyXMLOutputter(format);
-    outp.setSortAttributes(prop.containsKey("sortAttributes"));
-    outp.setIndentAttributes(prop.containsKey("indentAttributes"));
-    SAXBuilder builder = new SAXBuilder();
-    Document doc;
-    if (prop.containsKey("input")) {
-      doc = builder.build(new File(prop.getProperty("input")));
-    } else if (prop.containsKey("url")) {
-      doc = builder.build(new URL(prop.getProperty("url")));
-    } else {
-      doc = builder.build(System.in);
-    }
-    if (prop.containsKey("transform")) {
-      String[] sa = prop.getProperty("transform").split(";");
-      for (int i=0; i<sa.length; i++) {
-        XSLTransformer transformer = mkTransformer(sa[i].trim());
-        doc = transformer.transform(doc);
-      }
-    }
-    if (prop.containsKey("output")) {
-      FileOutputStream fos = null;
-      try {
-        fos = new FileOutputStream(new File(prop.getProperty("output")));
-        outp.output(doc, fos);
-      } finally {
-        IOUtils.closeQuietly(fos);
-      }
-    } else {
-      outp.output(doc, System.out);
-    }
+    PrettyPrint.execute(prop);
   }
+  
 }
