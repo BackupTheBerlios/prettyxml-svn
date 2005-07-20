@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="prettyxml" default="help" basedir=".">
+
+  <property name="version" value="1.1.0"/>
+  <property name="name" value="prettyxml"/>
+
+  <property name="build.dir" location="build"/>
+  <property name="build.dest" location="build/classes"/>
+  <property name="build.test" location="build/test"/>
+  <property name="build.javadocs" location="build/apidocs"/>
+  <property name="src.dir" location="src"/>
+  <property name="test.dir" location="test"/>
+  <property name="tmp.dir" location="tmp"/>
+  <property name="samples.dir" location="samples"/>
+  <property name="lib.dir" location="lib"/>
+  <property name="jdom.jar" value="jdom-1.0.jar"/>
+  <property name="commons-cli.jar" value="commons-cli-1.0.jar"/>
+  <property name="commons-io.jar" value="commons-io-1.0.jar"/>
+
+  <property environment="env"/>
+  <property name="distfile" location="${build.dir}/${name}-${version}.zip"/>
+
+  <path id="compile.class.path">
+    <pathelement location="${lib.dir}/${jdom.jar}"/>
+    <pathelement location="${lib.dir}/${commons-cli.jar}"/>
+    <pathelement location="${lib.dir}/${commons-io.jar}"/>
+  </path>
+
+  <path id="run.class.path">
+    <pathelement location="${lib.dir}/${name}.jar"/>
+  </path>
+
+  <path id="compile.test.class.path">
+    <path refid="compile.class.path"/>
+    <path refid="run.class.path"/>
+  </path>
+
+  <path id="test.class.path">
+    <pathelement location="${build.test}"/>
+    <path refid="run.class.path"/>
+  </path>
+
+  <path id="javadoc.class.path">
+    <path refid="compile.class.path"/>
+    <pathelement location="${build.dest}"/>
+  </path>
+
+  <target name="init">
+    <tstamp/>
+  </target>
+
+  <target name="help">
+    <echo message="Build of prettyxml ${version}"/>
+    <echo message="use ant -p to see targets with ant 1.6+"/>
+  </target>
+
+  <target name="check.jdk">
+    <condition property="ant.java.version.checked">
+      <contains substring="1.4" string="${ant.java.version}"/>
+    </condition>
+    <fail message="build needs jdk 1.4 - have ${ant.java.version}" unless="ant.java.version.checked"/>
+  </target>
+
+  <target name="prepare" depends="init">
+    <mkdir dir="${build.dest}"/>
+  </target>
+
+  <target name="compile" depends="check.jdk,prepare" description="Compiles the source code">
+    <javac srcdir="${src.dir}" destdir="${build.dest}">
+      <classpath refid="compile.class.path"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile,collect" description="Creates the class package">
+    <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.dest}">
+      <metainf file="LICENSE.txt"/>
+      <manifest>
+        <attribute name="Class-Path" value="${jdom.jar} ${commons-io.jar} ${commons-cli.jar} ."/>
+        <attribute name="Main-Class" value="dk.hippogrif.prettyxml.Main"/>
+        <section name="dk/hippogrif/prettyxml">
+          <attribute name="Implementation-Title" value="prettyxml"/>
+          <attribute name="Implementation-Version" value="${version}"/> 
+          <attribute name="Implementation-Vendor" value="Jesper Goertz"/>
+          <attribute name="Implementation-Vendor-Id" value="http://hippogrif.dk/sw/prettyxml"/>
+        </section>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="collect" description="Collects other files in classpath">
+    <echo message="version = ${version}" file="${build.dest}/${name}.properties"/>
+    <copy todir="${build.dest}" preservelastmodified="true">
+      <fileset dir="${src.dir}" includes="**/image/*"/>
+    </copy>
+    <copy todir="${build.dest}" preservelastmodified="true">
+      <fileset dir="${src.dir}" includes="**/package.html"/>
+    </copy>
+    <copy file="${samples.dir}/sort-attributes.xslt" todir="${build.dest}" preservelastmodified="true"/>
+    <copy file="${samples.dir}/sort-elements.xslt" todir="${build.dest}" preservelastmodified="true"/>
+  </target>
+
+  <target name="javadoc" depends="compile" description="Creates the API documentation">
+    <mkdir dir="${build.javadocs}"/>
+    <javadoc packagenames="dk.hippogrif.prettyxml"
+             sourcepath="${src.dir}"
+             destdir="${build.javadocs}"
+             link="http://jdom.org/docs/apidocs"
+             author="true"
+             version="true"
+             use="true"
+             splitindex="true"
+             noindex="false"
+             windowtitle="${name} v${version}"
+             doctitle="${name} v${version}&lt;br&gt;API Specification"
+             header="&lt;b&gt;${name}&lt;br&gt;&lt;font size='-1'&gt;${version}&lt;/font&gt;&lt;/b&gt;"
+             bottom="Copyright &#169; 2005 Jesper Goertz. All Rights Reserved.">
+      <classpath refid="javadoc.class.path"/>
+    </javadoc>
+  </target>
+
+  <target name="dist" depends="jar,javadoc" description="Creates the distribution package">
+    <delete file="${distfile}*"/>
+    <zip destfile="${distfile}">
+      <fileset dir="${basedir}">
+        <include name="HISTORY.txt"/>
+        <include name="README.txt"/>
+        <include name="LICENSE.txt"/>
+        <include name="prettyxml.bat"/>
+        <include name="prettyxml"/>
+        <include name="samples/**/*"/>
+      </fileset>
+      <zipfileset dir="${lib.dir}" prefix="lib">
+        <include name="${jdom.jar}"/>
+        <include name="${commons-cli.jar}"/>
+        <include name="${commons-io.jar}"/>
+        <include name="${name}.jar"/>
+      </zipfileset>
+      <fileset dir="${build.dir}" includes="apidocs/**/*"/>
+    </zip>
+    <checksum file="${distfile}"/>
+  </target>
+
+  <target name="verify" description="verifies checksum on distribution file">
+    <checksum file="${distfile}" verifyProperty="isMD5ok"/>
+    <condition property="checksum.failed">
+      <isfalse value="${isMD5ok}"/>
+    </condition>
+    <fail message="checksum failed" if="checksum.failed"/>
+  </target>
+
+  <target name="clean" depends="init" description="Removes build files">
+    <delete dir="${build.dir}"/>
+    <delete dir="${tmp.dir}"/>
+    <delete file="${lib.dir}/${name}.jar"/>
+  </target>
+
+  <target name="run" description="Runs program with arguments from -Dargs=">
+    <java classname="dk.hippogrif.prettyxml.Main" classpathref="run.class.path">
+      <arg line="${args}"/>
+    </java>
+  </target>
+
+  <target name="version" description="Runs program and displays version">
+    <java classname="dk.hippogrif.prettyxml.Main" classpathref="run.class.path">
+      <arg value="-v"/>
+    </java>
+  </target>
+
+  <target name="compile.test" depends="prepare" description="Compiles the test code">
+    <mkdir dir="${build.test}"/>
+    <javac srcdir="${test.dir}" destdir="${build.test}" debug="true">
+      <classpath refid="compile.test.class.path"/>
+    </javac>
+  </target>
+
+  <target name="test" depends="jar,compile.test" description="Runs test">
+    <mkdir dir="${tmp.dir}"/>
+    <junit>
+      <classpath refid="test.class.path"/>
+      <formatter type="plain" usefile="false"/>
+      <sysproperty key="dk.hippogrif.prettyxml.MainTest.dir" value="${test.dir}"/>
+      <sysproperty key="dk.hippogrif.prettyxml.MainTest.tmp" value="${tmp.dir}"/>
+      <test name="dk.hippogrif.prettyxml.MainTest"/>
+      <test name="dk.hippogrif.prettyxml.PrettyPrintTest"/>
+    </junit>
+  </target>
+
+  <target name="libs" description="get needed jars to lib and ant/lib">
+    <property name="repository" value="http://www.ibiblio.org/maven"/>
+    <property name="antlib" value="${env.ANT_HOME}/lib"/>
+    <get src="${repository}/junit/jars/junit-3.8.1.jar" dest="${antlib}/junit-3.8.1.jar"/>
+    <mkdir dir="${lib.dir}"/>
+    <get src="${repository}/commons-cli/jars/${commons-cli.jar}" dest="${lib.dir}/${commons-cli.jar}"/>
+    <get src="${repository}/commons-io/jars/${commons-io.jar}" dest="${lib.dir}/${commons-io.jar}"/>
+    <get src="${repository}/jdom/jars/${jdom.jar}" dest="${lib.dir}/${jdom.jar}"/>
+  </target>
+
+</project>

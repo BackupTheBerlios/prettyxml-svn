@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--If your domain is active, please do not edit the config.xml file. Any changes made to that file while the domain is active will not have any effect on the domain's configuration and are likely to be lost. If your domain is inactive, you may edit this file with an XML editor. If you do so, please refer to the BEA Weblogic Server Configuration Reference  documentation available from http://edocs.bea.com/wls/docs61/reference.html.  In general, we recommend that changes to your configuration file be made through the Administration Console.-->
+<Domain Name="petstore">
+    <Application Deployed="true" Name="tour" Path="C:\bea\wlserver6.1\config\petstore\applications">
+        <WebAppComponent Name="tour" Targets="petstoreServer" URI="tour.war"/>
+    </Application>
+    <Log FileName="./config/petstore/logs/wl-domain.log" Name="petstore"/>
+    <Application Deployed="true" Name="petstore" Path="C:\bea\wlserver6.1\config\petstore\applications\petstore.ear">
+        <EJBComponent Name="shoppingcartEjb" Targets="petstoreServer" URI="shoppingcartEjb.jar"/>
+        <EJBComponent Name="signonEjb" Targets="petstoreServer" URI="signonEjb.jar"/>
+        <EJBComponent Name="inventoryEjb" Targets="petstoreServer" URI="inventoryEjb.jar"/>
+        <EJBComponent Name="personalizationEjb" Targets="petstoreServer" URI="personalizationEjb.jar"/>
+        <EJBComponent Name="mailerEjb" Targets="petstoreServer" URI="mailerEjb.jar"/>
+        <WebAppComponent Name="petstore" Targets="petstoreServer" URI="petstore.war"/>
+        <EJBComponent Name="customerEjb" Targets="petstoreServer" URI="customerEjb.jar"/>
+        <EJBComponent Name="petstoreEjb" Targets="petstoreServer" URI="petstoreEjb.jar"/>
+    </Application>
+    <JDBCConnectionPool CapacityIncrement="1"
+        DriverName="COM.cloudscape.core.JDBCDriver" InitialCapacity="1"
+        MaxCapacity="1" Name="petstorePool"
+        Properties="user=none;password=none;server=none"
+        Targets="petstoreServer" URL="jdbc:cloudscape:petStore"/>
+    <Server IIOPEnabled="false" JavaCompiler="C:\bea\jdk131/bin/javac"
+        ListenPort="7001" Name="petstoreServer"
+        RootDirectory="C:\bea\wlserver6.1" TransactionLogFilePrefix="config/petstore/logs/">
+        <WebServer DefaultWebApp="tour"
+            LogFileName="./config/petstore/logs/access.log"
+            LoggingEnabled="true" Name="petstoreServer"/>
+        <SSL CertificateCacheSize="3"
+            Ciphersuites="SSL_RSA_EXPORT_WITH_RC4_40_MD5,SSL_RSA_WITH_DES_CBC_SHA,SSL_RSA_EXPORT_WITH_DES_40_CBC_SHA,SSL_NULL_WITH_NULL_NULL"
+            Enabled="true" ListenPort="7002" Name="petstoreServer"
+            ServerCertificateChainFileName="./config/petstore/ca.pem"
+            ServerCertificateFileName="./config/petstore/democert.pem"
+            ServerKeyFileName="./config/petstore/demokey.pem" TrustedCAFileName="./config/petstore/ca.pem"/>
+        <KernelDebug Name="petstoreServer"/>
+        <ExecuteQueue Name="default" ThreadCount="15"/>
+        <ServerDebug Name="petstoreServer"/>
+        <ServerStart Name="petstoreServer"/>
+        <Log FileName="./config/petstore/logs/weblogic.log" Name="petstoreServer"/>
+    </Server>
+    <ApplicationManager Name="petstore"/>
+    <Realm FileRealm="myFileRealm" Name="myRealm"/>
+    <JDBCTxDataSource JNDIName="jdbc.SignOnDB" Name="SignOnDB"
+        PoolName="petstorePool" Targets="petstoreServer"/>
+    <JDBCTxDataSource JNDIName="jdbc.InventoryDB" Name="InventoryDB"
+        PoolName="petstorePool" Targets="petstoreServer"/>
+    <JDBCTxDataSource JNDIName="jdbc.EstoreDB" Name="EstoreDB"
+        PoolName="petstorePool" Targets="petstoreServer"/>
+    <StartupClass Arguments="port=7001"
+        ClassName="com.bea.estore.startup.StartBrowser"
+        FailureIsFatal="false" Name="StartBrowser"
+        Notes="On Windows, this class automatically starts a browser after the server has finished booting." Targets="petstoreServer"/>
+    <FileRealm Name="myFileRealm"/>
+    <PasswordPolicy Name="wl_default_password_policy"/>
+    <Security Name="petstore"
+        PasswordPolicy="wl_default_password_policy" Realm="myRealm"/>
+    <Application Deployed="true" Name="petstoreAdmin" Path="C:\bea\wlserver6.1\config\petstore\applications\petstoreAdmin.ear">
+        <WebAppComponent Name="petstoreadmin" Targets="petstoreServer" URI="petstoreadmin.war"/>
+        <EJBComponent Name="petstoreAdminEjb" Targets="petstoreServer" URI="petstoreadminEjb.jar"/>
+    </Application>
+    <JTA Name="petstore"/>
+    <SNMPAgent Name="petstore"/>
+    <MailSession JNDIName="mail.Session" Name="mailSession"
+        Properties="mail.from=orders@javapetstoredemo.com;mail.host=san-francisco.beasys.com" Targets="petstoreServer"/>
+</Domain>
