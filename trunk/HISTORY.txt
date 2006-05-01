@@ -8,3 +8,8 @@ prettyxml 1.1.0, 2005-07-20
 - java.logging.util for logging
 - GUI for property setting, load and store when no program options
 
+prettyxml 1.2.0, 2006-05-01
+- restructured to allow for jedit plugin besides application
+- built-in settings and transformation stylesheets
+- GUI support for specifying built-ins and stylesheet sequences
+

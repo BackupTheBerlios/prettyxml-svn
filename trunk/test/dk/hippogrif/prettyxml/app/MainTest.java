@@ -3,7 +3,7 @@
  * JUnit based test
  */
 
-package dk.hippogrif.prettyxml;
+package dk.hippogrif.prettyxml.app;
 
 import junit.framework.*;
 import java.io.*;
@@ -15,6 +15,8 @@ import org.jdom.*;
 import org.jdom.input.*;
 import org.jdom.output.*;
 import org.jdom.transform.XSLTransformer;
+import dk.hippogrif.prettyxml.app.*;
+
 
 /**
  *
@@ -29,7 +31,7 @@ public class MainTest extends TestCase {
   private String testdir, tmpdir;
   
   protected String getDir(String property) throws Exception {
-    String name = "dk.hippogrif.prettyxml.MainTest."+property;
+    String name = "dk.hippogrif.prettyxml.app.MainTest."+property;
     String dir = System.getProperty(name);
     if (dir == null || !new File(dir).isDirectory()) {
       throw new Exception("cannot find dir "+name+"="+dir);
@@ -84,13 +86,13 @@ public class MainTest extends TestCase {
       cmd = Main.getCmdLine(new String[]{"-n","5","-a","-t","xxx;yyy","-i","aaa","-o","bbb"});
       prop = Main.getProperties(cmd);
       assertTrue("5".equals(prop.getProperty("indent")));
-      assertTrue("TRUE".equals(prop.getProperty("indentAttributes")));
+      assertTrue(Boolean.valueOf(prop.getProperty("indentAttributes")).booleanValue());
       assertTrue("xxx;yyy".equals(prop.getProperty("transform")));
       assertTrue("aaa".equals(prop.getProperty("input")));
       assertTrue("bbb".equals(prop.getProperty("output")));
       cmd = Main.getCmdLine(new String[]{"-s","-u","ccc"});
       prop = Main.getProperties(cmd);
-      assertTrue("TRUE".equals(prop.getProperty("sortAttributes")));
+      assertTrue(Boolean.valueOf(prop.getProperty("sortAttributes")).booleanValue());
       assertTrue("ccc".equals(prop.getProperty("url")));
     } catch (Exception e) {
       fail(e.toString());
@@ -100,11 +102,11 @@ public class MainTest extends TestCase {
       cmd = Main.getCmdLine(new String[]{"-p",propertyFile});
       prop = Main.getProperties(cmd);
       assertTrue("3".equals(prop.getProperty("indent")));
-      assertTrue("TRUE".equals(prop.getProperty("indentAttributes")));
+      assertTrue(Boolean.valueOf(prop.getProperty("indentAttributes")).booleanValue());
       cmd = Main.getCmdLine(new String[]{"-n","4","-p",propertyFile});
       prop = Main.getProperties(cmd);
       assertTrue("4".equals(prop.getProperty("indent")));
-      assertTrue("TRUE".equals(prop.getProperty("indentAttributes")));
+      assertTrue(Boolean.valueOf(prop.getProperty("indentAttributes")).booleanValue());
     } catch (Exception e) {
       fail(e.toString());
     }

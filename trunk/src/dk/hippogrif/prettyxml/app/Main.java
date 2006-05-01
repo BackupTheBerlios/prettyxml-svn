@@ -17,7 +17,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package dk.hippogrif.prettyxml;
+package dk.hippogrif.prettyxml.app;
 
 import java.io.*;
 import java.net.*;
@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
+import dk.hippogrif.prettyxml.*;
 
 /**
  * A command line application for prettyprinting an xml file.
@@ -111,10 +112,23 @@ public class Main {
     ps.println("  url = input url");
     ps.println("  output = output file");
     ps.println("");
-    ps.println("use the xslt pipeline to sort elements or filter nodes -");
-    ps.println("stylesheets are located first as files then as resources on the classpath.");
+    ps.println("use the xslt pipeline to sort elements or filter nodes");
     ps.println("standard input is used if no file or url is specified");
     ps.println("standard output is used if no file is specified");
+    ps.println("property file and transformation stylesheets are located in this order:");
+    ps.println("  built-in, file, classpath resource");
+    ps.print("built-in property files:");
+    String[] sa = PrettyPrint.getSettings();
+    for (int i=0; i<sa.length; i++) {
+      ps.print(" "+sa[i]);
+    }
+    ps.println("");
+    ps.print("built-in transformation stylesheets:");
+    sa = PrettyPrint.getTransformations();
+    for (int i=0; i<sa.length; i++) {
+      ps.print(" "+sa[i]);
+    }
+    ps.println("");
   }
   
   private static void version(PrintStream ps) {
@@ -175,34 +189,38 @@ public class Main {
   static Properties getProperties(CommandLine cmd) throws Exception {
     Properties prop = new Properties();
     if (cmd.hasOption("p")) {
-      prop = PrettyPrint.loadProperties(new File(cmd.getOptionValue("p")));
+      String pname = cmd.getOptionValue("p");
+      prop = PrettyPrint.getSetting(pname);
+      if (prop == null) {
+        prop = PrettyPrint.loadProperties(new File(pname));
+      }
     } else {
       // default Pretty format
-      prop.put("indent", "2");
-      prop.put("textMode", "TRIM");
+      prop.put(PrettyPrint.INDENT, "2");
+      prop.put(PrettyPrint.TEXT_MODE, "TRIM");
     }
     if (cmd.hasOption("n")) {
-      prop.put("indent", cmd.getOptionValue("n"));
+      prop.put(PrettyPrint.INDENT, cmd.getOptionValue("n"));
     }
     if (cmd.hasOption("a")) {
-      prop.put("indentAttributes", "TRUE");
+      prop.put(PrettyPrint.INDENT_ATTRIBUTES, "TRUE");
     }
     if (cmd.hasOption("s")) {
-      prop.put("sortAttributes", "TRUE");
+      prop.put(PrettyPrint.SORT_ATTRIBUTES, "TRUE");
     }
     if (cmd.hasOption("t")) {
-      prop.put("transform", cmd.getOptionValue("t"));
+      prop.put(PrettyPrint.TRANSFORM, cmd.getOptionValue("t"));
     }
     if (cmd.hasOption("i")) {
-      prop.put("input", cmd.getOptionValue("i"));
+      prop.put(PrettyPrint.INPUT, cmd.getOptionValue("i"));
     }
     if (cmd.hasOption("o")) {
-      prop.put("output", cmd.getOptionValue("o"));
+      prop.put(PrettyPrint.OUTPUT, cmd.getOptionValue("o"));
     }
     if (cmd.hasOption("u")) {
-      prop.put("url", cmd.getOptionValue("u"));
+      prop.put(PrettyPrint.URL, cmd.getOptionValue("u"));
     }
-    PrettyPrint.checkProperties(prop);
+    PrettyPrint.checkProperties(prop, true);
     return prop;
   }
   

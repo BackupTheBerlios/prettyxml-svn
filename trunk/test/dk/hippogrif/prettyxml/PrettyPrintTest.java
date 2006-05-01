@@ -29,7 +29,7 @@ public class PrettyPrintTest extends TestCase {
   private String testdir, tmpdir;
   
   protected String getDir(String property) throws Exception {
-    String name = "dk.hippogrif.prettyxml.MainTest."+property;
+    String name = "dk.hippogrif.prettyxml.app.MainTest."+property;
     String dir = System.getProperty(name);
     if (dir == null || !new File(dir).isDirectory()) {
       throw new Exception("cannot find dir "+name+"="+dir);
@@ -75,7 +75,7 @@ public class PrettyPrintTest extends TestCase {
     System.out.println("testLoadConfiguration");
     try {
       PrettyPrint pp = new PrettyPrint();
-      pp.loadConfiguration("/prettyxml.properties");
+      pp.loadConfiguration("prettyxml.properties");
       assertNotNull(pp.getVersion());
     } catch (Exception e) {
       fail(e.toString());
@@ -169,7 +169,7 @@ public class PrettyPrintTest extends TestCase {
     System.out.println("testCheckProperties");
     Properties prop = new Properties();;
     try {
-      PrettyPrint.checkProperties(prop);
+      PrettyPrint.checkProperties(prop, true);
     } catch (Exception e) {
       fail(e.toString());
     }
@@ -177,7 +177,7 @@ public class PrettyPrintTest extends TestCase {
       prop.setProperty("encoding","x");
       prop.setProperty("expandEmptyElements","true");
       prop.setProperty("indent","1");
-      prop.setProperty("lineSeparator","x");
+      prop.setProperty("lineSeparator","\n");
       prop.setProperty("omitDeclaration","false");
       prop.setProperty("omitEncoding","True");
       prop.setProperty("textMode","x");
@@ -187,53 +187,53 @@ public class PrettyPrintTest extends TestCase {
       prop.setProperty("input","x");
       prop.setProperty("output","x");
       assertTrue(PrettyPrint.keys.size()-1 == prop.size());
-      PrettyPrint.checkProperties(prop);
-      assertTrue(10 == prop.size());
+      PrettyPrint.checkProperties(prop, true);
+      assertTrue(12 == prop.size());
     } catch (Exception e) {
       fail(e.toString());
     }
     try {
       prop.clear();
       prop.setProperty("url","x");
-      PrettyPrint.checkProperties(prop);
+      PrettyPrint.checkProperties(prop, true);
     } catch (Exception e) {
       fail(e.toString());
     }
     try {
       prop.clear();
       prop.setProperty("indent","0");
-      PrettyPrint.checkProperties(prop);
-      fail("indent 0");
+      PrettyPrint.checkProperties(prop, true);
+      assertFalse(prop.containsKey("indent"));
     } catch (Exception e) {}
     try {
       prop.clear();
       prop.setProperty("indent","100");
-      PrettyPrint.checkProperties(prop);
+      PrettyPrint.checkProperties(prop, true);
       fail("indent 100");
     } catch (Exception e) {}
     try {
       prop.clear();
       prop.setProperty("indent","x");
-      PrettyPrint.checkProperties(prop);
+      PrettyPrint.checkProperties(prop, true);
       fail("indent not integer");
     } catch (Exception e) {}
     try {
       prop.clear();
       prop.setProperty("x","y");
-      PrettyPrint.checkProperties(prop);
-      fail("unknown property");
+      PrettyPrint.checkProperties(prop, true);
+      assertFalse(prop.containsKey("x"));
     } catch (Exception e) {}
     try {
       prop.clear();
       prop.setProperty("input","aaa");
       prop.setProperty("url","bbb");
-      PrettyPrint.checkProperties(prop);
+      PrettyPrint.checkProperties(prop, true);
       fail("input and url");
     } catch (Exception e) {}
     try {
       prop.clear();
       prop.setProperty("omitEncoding","y");
-      PrettyPrint.checkProperties(prop);
+      PrettyPrint.checkProperties(prop, true);
       fail("bad boolean");
     } catch (Exception e) {}
   }
@@ -257,7 +257,7 @@ public class PrettyPrintTest extends TestCase {
     System.out.println("testStoreProperties");
     try {
       Properties prop = PrettyPrint.loadProperties(new File(testdir+"/ex.properties"));
-      PrettyPrint.storeProperties(new File(tmpdir+"/ex.properties"), prop, "test");
+      PrettyPrint.storeProperties(new File(tmpdir+"/ex.properties"), prop);
       Properties tmpprop = PrettyPrint.loadProperties(new File(tmpdir+"/ex.properties"));
       assertTrue(prop.equals(tmpprop));
     } catch (Exception e) {
@@ -278,7 +278,7 @@ public class PrettyPrintTest extends TestCase {
       PrettyPrint.checkBoolean("notkey", prop);
       assertTrue(prop.size() == 3);
       PrettyPrint.checkBoolean("f", prop);
-      assertFalse(prop.containsKey("f"));
+      assertTrue(prop.containsKey("f"));
       PrettyPrint.checkBoolean("t", prop);
       assertTrue(prop.containsKey("t"));
       PrettyPrint.checkBoolean("w", prop);

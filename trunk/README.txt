@@ -23,6 +23,14 @@ Download the latest version from http://java.sun.com/j2se
 How to use
 ==========
 
+Unpack the distributed zip file in a directory of your choice. 
+
+To invoke the GUI simply run java -jar prettyxml.jar 
+or use the command script as described in the following.
+
+use command script
+------------------
+
 First set the environment variable PRETTYXML_HOME to the directory
 where you unpacked the distribution file, e.g.,
   set PRETTYXML_HOME=c:\prettyxml  (on Windows)
@@ -38,11 +46,32 @@ or
 
 Say "prettyxml -v" to get the version and "prettyxml -h" to get help.
 
-Transformation stylesheets are first located as files then as resources
-on the classpath - sort-attributes.xslt and sort-elements.xslt are built-in.
-You may place your own stylesheets in lib to be found as resources.
-
 If invoked without options a GUI is activated for format and option setting.
+
+built-in settings and stylesheets
+---------------------------------
+
+The following settings are built-in
+
+  pretty    JDOM format: trimmed whitespace and 2 space indentation
+  raw       JDOM format: preserved whitespace, no indentation
+  compact   JDOM format: whitespace normalization (oneliner+declaration)
+  indented  trimmed whitespace with element and attribute indentation
+            and sorted attributes
+  sorted    as indented but with elements sorted, useful for line diff
+
+The following transformation stylesheets are built-in
+
+  sort-attributes   sort of attributes (needed for sort of elements) 
+                    by name ascending</li>
+  sort-elements     sort of elements by name ascending and
+                    by (first 6) attributes and then text content
+
+Other settings and transformation stylesheets are first located as files 
+then as resources on the classpath.
+
+You may place your own properties files and stylesheets in lib to be found 
+as resources.
 
 Examples
 ========
@@ -53,8 +82,9 @@ The directory samples contains a few examples on use, run the bat or sh files.
 Files
 =====
 
-LICENSE.txt       The License file (GPL)
-README.txt        An english readme (this file)
+LICENSE.txt       the License file (GPL)
+README.txt        an english readme (this file)
+HISTORY.txt       release history
 apidoc            directory holding javadoc for prettyxml
 lib               directory holding jar files and stylesheets
 samples           directory holding examples

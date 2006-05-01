@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="prettyxml" default="help" basedir=".">
 
-  <property name="version" value="1.1.0"/>
+  <property name="version" value="1.2.0"/>
   <property name="name" value="prettyxml"/>
 
   <property name="build.dir" location="build"/>
@@ -11,6 +11,7 @@
   <property name="src.dir" location="src"/>
   <property name="test.dir" location="test"/>
   <property name="tmp.dir" location="tmp"/>
+  <property name="jedit.dir" location="jedit"/>
   <property name="samples.dir" location="samples"/>
   <property name="lib.dir" location="lib"/>
   <property name="jdom.jar" value="jdom-1.0.jar"/>
@@ -66,7 +67,7 @@
   </target>
 
   <target name="compile" depends="check.jdk,prepare" description="Compiles the source code">
-    <javac srcdir="${src.dir}" destdir="${build.dest}">
+    <javac srcdir="${src.dir}" excludes="dk/hippogrif/prettyxml/jedit/**" destdir="${build.dest}" debug="true">
       <classpath refid="compile.class.path"/>
     </javac>
   </target>
@@ -76,7 +77,7 @@
       <metainf file="LICENSE.txt"/>
       <manifest>
         <attribute name="Class-Path" value="${jdom.jar} ${commons-io.jar} ${commons-cli.jar} ."/>
-        <attribute name="Main-Class" value="dk.hippogrif.prettyxml.Main"/>
+        <attribute name="Main-Class" value="dk.hippogrif.prettyxml.app.Main"/>
         <section name="dk/hippogrif/prettyxml">
           <attribute name="Implementation-Title" value="prettyxml"/>
           <attribute name="Implementation-Version" value="${version}"/> 
@@ -88,20 +89,20 @@
   </target>
 
   <target name="collect" description="Collects other files in classpath">
-    <echo message="version = ${version}" file="${build.dest}/${name}.properties"/>
-    <copy todir="${build.dest}" preservelastmodified="true">
-      <fileset dir="${src.dir}" includes="**/image/*"/>
+    <copy todir="${build.dest}" preservelastmodified="true" overwrite="true">
+      <fileset dir="${src.dir}">
+        <include name="**/image/*"/>
+        <include name="dk/hippogrif/prettyxml/app/help.html"/>
+        <include name="*.xslt"/>
+        <include name="*.properties"/>
+      </fileset>
     </copy>
-    <copy todir="${build.dest}" preservelastmodified="true">
-      <fileset dir="${src.dir}" includes="**/package.html"/>
-    </copy>
-    <copy file="${samples.dir}/sort-attributes.xslt" todir="${build.dest}" preservelastmodified="true"/>
-    <copy file="${samples.dir}/sort-elements.xslt" todir="${build.dest}" preservelastmodified="true"/>
+    <echo message="version = ${version}" file="${build.dest}/${name}.properties" append="true"/>
   </target>
 
   <target name="javadoc" depends="compile" description="Creates the API documentation">
     <mkdir dir="${build.javadocs}"/>
-    <javadoc packagenames="dk.hippogrif.prettyxml"
+    <javadoc packagenames="dk.hippogrif.prettyxml,dk.hippogrif.prettyxml.app,dk.hippogrif.prettyxml.jedit"
              sourcepath="${src.dir}"
              destdir="${build.javadocs}"
              link="http://jdom.org/docs/apidocs"
@@ -155,13 +156,13 @@
   </target>
 
   <target name="run" description="Runs program with arguments from -Dargs=">
-    <java classname="dk.hippogrif.prettyxml.Main" classpathref="run.class.path">
+    <java jar="${lib.dir}/${name}.jar" fork="true">
       <arg line="${args}"/>
     </java>
   </target>
 
   <target name="version" description="Runs program and displays version">
-    <java classname="dk.hippogrif.prettyxml.Main" classpathref="run.class.path">
+    <java jar="${lib.dir}/${name}.jar" fork="true">
       <arg value="-v"/>
     </java>
   </target>
@@ -178,9 +179,9 @@
     <junit>
       <classpath refid="test.class.path"/>
       <formatter type="plain" usefile="false"/>
-      <sysproperty key="dk.hippogrif.prettyxml.MainTest.dir" value="${test.dir}"/>
-      <sysproperty key="dk.hippogrif.prettyxml.MainTest.tmp" value="${tmp.dir}"/>
-      <test name="dk.hippogrif.prettyxml.MainTest"/>
+      <sysproperty key="dk.hippogrif.prettyxml.app.MainTest.dir" value="${test.dir}"/>
+      <sysproperty key="dk.hippogrif.prettyxml.app.MainTest.tmp" value="${tmp.dir}"/>
+      <test name="dk.hippogrif.prettyxml.app.MainTest"/>
       <test name="dk.hippogrif.prettyxml.PrettyPrintTest"/>
     </junit>
   </target>
@@ -193,6 +194,31 @@
     <get src="${repository}/commons-cli/jars/${commons-cli.jar}" dest="${lib.dir}/${commons-cli.jar}"/>
     <get src="${repository}/commons-io/jars/${commons-io.jar}" dest="${lib.dir}/${commons-io.jar}"/>
     <get src="${repository}/jdom/jars/${jdom.jar}" dest="${lib.dir}/${jdom.jar}"/>
+  </target>
+
+  <target name="jedit.plugin.src" description="Setup source for jedit plugin">
+    <property name="build.jedit" location="${build.dir}/jedit"/>
+    <copy file="${jedit.dir}/build.xml" todir="${build.jedit}" preservelastmodified="true">
+      <filterset>
+        <filter token="PRETTYXML-VERSION" value="${version}"/>
+      </filterset>
+    </copy>
+    <copy todir="${build.jedit}/src" preservelastmodified="true">
+      <fileset dir="${src.dir}" includes="*"/>
+      <fileset dir="${src.dir}" includes="dk/hippogrif/prettyxml/image/*"/>
+      <fileset dir="${src.dir}" includes="dk/hippogrif/prettyxml/jedit/*"/>
+      <fileset dir="${src.dir}" includes="dk/hippogrif/prettyxml/*.java"/>
+    </copy>
+    <copy todir="${build.jedit}" preservelastmodified="true">
+      <fileset dir="${jedit.dir}" includes="build.properties,actions.xml,prettyxml.props,docs/**/*"/>
+      <fileset dir="${samples.dir}" includes="sort-attributes.xslt,sort-elements.xslt"/>
+    </copy>
+    <copy file="LICENSE.txt" todir="${build.jedit}" preservelastmodified="true"/>
+  </target>
+
+  <target name="jedit.plugin" depends="jedit.plugin.src" description="Builds the jedit plugin and source dist">
+    <ant dir="${build.jedit}" target="src" inheritAll="false"/>
+    <ant dir="${build.jedit}" inheritAll="false"/>
   </target>
 
 </project>

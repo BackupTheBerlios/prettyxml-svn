@@ -190,8 +190,65 @@ public class PrettyXMLOutputter extends XMLOutputter {
         out.write(indent);
     }
     
+    public void output(Document doc, Writer out) throws IOException {
+
+        printDeclaration(out, doc, currentFormat.getEncoding());
+
+        // Print out root element, as well as any root level
+        // comments and processing instructions,
+        // starting with no indentation
+        List content = doc.getContent();
+        int size = content.size();
+        for (int i = 0; i < size; i++) {
+            Object obj = content.get(i);
+
+            if (obj instanceof Element) {
+                printElement(out, doc.getRootElement(), 0, createNamespaceStack());
+            }
+            else if (obj instanceof Comment) {
+                printComment(out, (Comment) obj);
+            }
+            else if (obj instanceof ProcessingInstruction) {
+                printProcessingInstruction(out, (ProcessingInstruction) obj);
+            }
+            else if (obj instanceof DocType) {
+                printDocType(out, doc.getDocType());
+                // Always print line separator after declaration, helps the
+                // output look better and is semantically inconsequential
+                out.write(currentFormat.getLineSeparator());
+            }
+            else {
+                // XXX if we get here then we have a illegal content, for
+                //     now we'll just ignore it
+            }
+
+            newline(out);
+            indent(out, 0);
+        }
+
+        // Output final line separator unless already done
+        // We output this no matter what the newline flags say
+        if (size > 0 && currentFormat.getIndent() == null) {
+            out.write(currentFormat.getLineSeparator());
+        }
+
+        out.flush();
+    }
+
     private void newline(Writer out) throws IOException {
-        out.write(currentFormat.getLineSeparator());
+        if (currentFormat.getIndent() != null) {
+            out.write(currentFormat.getLineSeparator());
+        }
+    }
+    
+    private NamespaceStack createNamespaceStack() {
+       // actually returns a XMLOutputter.NamespaceStack (see below)
+       return new MyNamespaceStack();
+    }
+
+    protected class MyNamespaceStack
+        extends NamespaceStack
+    {
     }
 
     private int skipLeadingWhite(List content, int start) {

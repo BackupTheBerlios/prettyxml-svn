@@ -1,0 +1,405 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+
+  <meta content="Jesper Goertz" name="author">
+
+  <meta content="Help for the prettyxml java application" name="description">
+  <title>dk.hippogrif.prettyxml.app</title>
+
+
+</head>
+
+
+<body>
+<span style="font-weight: bold; font-style: italic;">prettyxml
+</span>is a <a href="http://www.gnu.org/licenses/gpl.html">free</a> java utility for prettyprinting xml with attribute
+sorting and
+indentation.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+prettyxml is based on <a href="http://jdom.org/">JDOM 1.0</a>.
+The {@link dk.hippogrif.prettyxml.app application} runs with command-line&nbsp;options
+or presents a GUI when no
+options are present. <br>
+
+
+
+<br>
+prettyxml offers various format options and supports element sorting
+and node filtering via
+stylesheet transformations.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Java 1.4 (JRE) or later is required. For logging java.util.logging is
+used.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+For more information please see <a href="http://hippogrif.dk/sw/prettyxml">http://hippogrif.dk/sw/prettyxml</a><br>
+<br>
+The application runs with <a href="#cmd">command-line&nbsp;options</a>
+or presents a <a href="#gui">GUI</a> when no
+options are present. <br>
+<h3><a name="gui"></a>GUI</h3>
+
+When invoked without command-line options prettyxml presents a GUI for
+setting properties
+before execution. The GUI allows for storing and loading properties
+from a file.
+<br>
+<h3><a name="properties"></a>Properties</h3>
+
+A property file may hold the following&nbsp;<a href="http://jdom.org/docs/apidocs/org/jdom/output/Format.html">JDOM
+format</a>&nbsp;and prettyxml options<br>
+
+<br>
+
+<table style="text-align: left; margin-left: auto; margin-right: auto; width: 612px; height: 228px;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="font-weight: bold; width: 144px;">format
+property</td>
+
+      <td style="font-weight: bold; width: 448px;">value</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">encoding</td>
+
+      <td style="width: 448px;">string, e.g., UTF-8
+(default), ISO-8859-1</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">expandEmptyElements</td>
+
+      <td style="width: 448px;">TRUE | FALSE (default)</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">indent</td>
+
+      <td style="width: 448px;">no of spaces to indent
+(min 1, max 99) or 0 for no indentation (default)</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">lineSeparator</td>
+
+      <td style="width: 448px;">string, i.e., \r, \n or
+\r\n (default)</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">omitDeclaration</td>
+
+      <td style="width: 448px;">TRUE | FALSE (default)</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">omitEncoding</td>
+
+      <td style="width: 448px;">TRUE | FALSE (default)</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">textMode</td>
+
+      <td style="width: 448px;">NORMALIZE | TRIM |
+TRIM_FULL_WHITE | PRESERVE (default)</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<table style="width: 612px; height: 200px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="font-weight: bold; width: 144px;">prettyxml
+property</td>
+
+      <td style="font-weight: bold; width: 448px;">value</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">indentAttributes</td>
+
+      <td style="width: 448px;">TRUE | FALSE (default)</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">sortAttributes</td>
+
+      <td style="width: 448px;">TRUE | FALSE (default)</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">transform</td>
+
+      <td style="width: 448px;">an xslt
+pipeline of
+one or more stylesheets separated by ";" - non-built-in stylesheets are
+located first as files then as resources on the classpath</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">input</td>
+
+      <td style="width: 448px;"> input file - standard
+input is used if no file or url
+is specified</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">url</td>
+
+      <td style="width: 448px;"> input url
+-&nbsp;standard input is used if no file
+or url is specified</td>
+
+    </tr>
+
+    <tr>
+
+      <td style="width: 144px;">output</td>
+
+      <td style="width: 448px;">output file - standard
+output is used if no file is
+specified</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+Unknown properties are ignored. Properties input and url are exclusive.<br>
+<h3><a name="built-in"></a>Built-in settings
+and stylesheets</h3>
+
+The following settings are built-in
+<ul>
+
+  <li>pretty - JDOM format: trimmed whitespace and 2 space
+indentation</li>
+
+  <li>raw - JDOM format: preserved whitespace, no indentation</li>
+
+  <li>compact - JDOM format: whitespace normalization (oneliner +
+declaration)</li>
+
+  <li>indented - trimmed whitespace with element and attribute
+indentation and sorted attributes</li>
+
+  <li>sorted - as indented but with elements sorted, useful for
+line diff</li>
+
+</ul>
+
+The following stylesheet transformations are built-in<br>
+
+<ul>
+
+  <li>sort-attributes - sort of attributes (needed for sort of
+elements) by name ascending</li>
+
+  <li>sort-elements - sort of&nbsp;elements by name ascending
+and by (first 6) attributes and then text content.</li>
+
+</ul>
+<div style="text-align: left;">
+<h3><a name="cmd"></a>Command-line options</h3>
+
+prettyxml accepts the following options from the command-line<br>
+
+<br>
+
+<table style="text-align: left; margin-left: auto; margin-right: auto; width: 612px; height: 312px;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="font-weight: bold; text-align: left;">option</td>
+
+      <td style="font-weight: bold; text-align: left;">argument</td>
+
+      <td style="font-weight: bold;">meaning</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-a</td>
+
+      <td>&nbsp;</td>
+
+      <td>indent attributes</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-h</td>
+
+      <td>&nbsp;</td>
+
+      <td>help</td>
+
+    </tr>
+
+    <tr>
+
+      <td> -i</td>
+
+      <td> file</td>
+
+      <td>input file</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-n</td>
+
+      <td>no</td>
+
+      <td>no of spaces to indent, default 2</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-o</td>
+
+      <td>file</td>
+
+      <td>output file</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-p</td>
+
+      <td>file</td>
+
+      <td>built-in setting or property file&nbsp;holding output format and options</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-s</td>
+
+      <td>&nbsp;</td>
+
+      <td>sort attributes on name</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-t</td>
+
+      <td>files</td>
+
+      <td>an xslt pipeline of one or more stylesheets separated
+by ";"</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-u</td>
+
+      <td>url</td>
+
+      <td>input url</td>
+
+    </tr>
+
+    <tr>
+
+      <td>-v</td>
+
+      <td>&nbsp;</td>
+
+      <td>print version</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+If the -p option is used properties
+are loaded from named <a href="help.html#built-in">built-in</a> setting or specified file before the remaining options are applied, ie., a
+command-line option overrides a loaded property.
+</div>
+</body>
+</html>

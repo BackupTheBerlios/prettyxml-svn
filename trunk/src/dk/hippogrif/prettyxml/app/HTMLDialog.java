@@ -17,7 +17,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package dk.hippogrif.prettyxml;
+package dk.hippogrif.prettyxml.app;
 
 import java.awt.Dimension;
 import java.net.URL;
@@ -33,8 +33,6 @@ import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 /**
  * Renders an HTML page in a dialog window with hyperlinks and history.
  * The history is made available by forward, back and home buttons.
- *
- * @author  Jesper Goertz
  */
 public class HTMLDialog extends javax.swing.JDialog {
   private Logger logger = Logger.getLogger(getClass().getName());
