@@ -1,0 +1,506 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+
+
+
+
+  
+  
+  
+  <meta content="Jesper Goertz" name="author">
+
+
+
+
+  
+  
+  
+  <meta content="Package description for the prettyxml java application" name="description">
+
+
+
+  
+  
+  
+  <title>dk.hippogrif.prettyxml.app</title>
+</head>
+
+
+<body>
+The application runs with <a href="#cmd">command-line options</a>
+or presents a <a href="#gui">graphical user interface</a> when no
+options are present. <br>
+<h3><a name="cmd"></a>Command-line options</h3>
+
+
+
+
+prettyxml accepts the following options from the command-line<br>
+
+
+
+
+<br>
+
+
+
+
+<table style="text-align: left; margin-left: auto; margin-right: auto; width: 612px; height: 312px;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="font-weight: bold; text-align: left;">option</td>
+
+
+
+
+      <td style="font-weight: bold; text-align: left;">argument</td>
+
+
+
+
+      <td style="font-weight: bold;">meaning</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-a</td>
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+      <td>indent attributes</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-h</td>
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+      <td>help</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td> -i</td>
+
+
+
+
+      <td> file</td>
+
+
+
+
+      <td>input file</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-n</td>
+
+
+
+
+      <td>no</td>
+
+
+
+
+      <td>no of spaces to indent, default 2</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-o</td>
+
+
+
+
+      <td>file</td>
+
+
+
+
+      <td>output file</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-p</td>
+
+
+
+
+      <td>file</td>
+
+
+
+
+      <td>property file holding output format and options</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-s</td>
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+      <td>sort attributes on name</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-t</td>
+
+
+
+
+      <td>files</td>
+
+
+
+
+      <td>an xslt pipeline of one or more stylesheets separated
+by ";"</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-u</td>
+
+
+
+
+      <td>url</td>
+
+
+
+
+      <td>input url</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>-v</td>
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+      <td>print version</td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+If the -p option is used&nbsp;{@link dk.hippogrif.prettyxml#properties properties}</a>
+are loaded from a file before the remaining options are applied, ie., a
+command-line option overrides a loaded property.
+<h3><a name="properties"></a>Properties</h3>
+
+
+
+
+A property file may hold the basic {@link dk.hippogrif.prettyxml#properties properties} and the following extra prettyxml properties<br>
+
+
+
+
+<br>
+
+
+
+
+<table style="width: 612px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="font-weight: bold;">prettyxml property</td>
+
+
+
+
+      <td style="font-weight: bold;">value</td>
+
+
+
+
+    </tr>
+
+
+
+
+    
+
+
+
+    
+
+
+
+    
+
+
+
+    <tr>
+
+
+
+
+      <td>input</td>
+
+
+
+
+      <td> input file - standard input is used if no file or url
+is specified</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>url</td>
+
+
+
+
+      <td> input url -&nbsp;standard input is used if no file
+or url is specified</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>output</td>
+
+
+
+
+      <td>output file - standard output is used if no file is
+specified</td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+ Unknown properties are ignored. Properties input and url are exclusive.<br>
+
+
+
+
+<h3><a name="gui"></a>GUI</h3>
+
+
+
+
+When invoked without command-line options prettyxml presents a GUI for
+setting {@link dk.hippogrif.prettyxml#properties properties}
+before execution. The GUI allows for storing and loading properties from a file.
+</body>
+</html>

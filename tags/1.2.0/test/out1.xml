@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+  default="gen"
+>
+  <concat>
+    <filelist
+      dir="."
+      files="${dest.file}"
+    />
+  </concat>
+  <property
+    name="dest.file"
+    value="y.txt"
+  />
+  <delete
+    file="${dest.file}"
+  />
+  <concat />
+  <copy
+    file="${src.file}"
+    tofile="${dest.file}"
+  >
+    <target
+      name="gen"
+    />
+    <filterchain>
+      <!--project default="gen"-->
+      <tokenfilter>
+        <replaceregex
+          pattern="^#if env:(?:.+,)?${env}(?:,.*)? *$"
+        />
+        <replaceregex
+          pattern="^#endif env:(?:.+,)?${env}(?:,.*)? *$"
+        />
+      </tokenfilter>
+    </filterchain>
+  </copy>
+  <abe
+    a="1"
+    b="2"
+    c="6"
+    d="4"
+    e="5"
+  >B</abe>
+  <abe
+    a="1"
+    b="2"
+    c="3"
+    d="4"
+    e="5"
+  />
+  <replaceregexp
+    file="${dest.file}"
+    flags="mg"
+    match="^#if env:(?:.*[\n\r]+)+?#endif env:.*$"
+    replace=""
+  />
+  <property
+    location="x.txt"
+    name="src.file"
+  />
+  <replaceregexp
+    file="${dest.file}"
+    flags="g"
+    match="(\r\n|\n|\r){1,}"
+    replace="\1"
+  />
+  <target
+    name="gen"
+  />
+  <abe
+    a="1"
+    b="2"
+    c="3"
+    d="4"
+    e="5"
+  >B</abe>
+  <abe
+    a="1"
+    b="2"
+    c="3"
+    d="4"
+    e="5"
+  >A</abe>
+</project>
